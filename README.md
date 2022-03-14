@@ -19,6 +19,8 @@
 -   [ ] 프로세싱 기초
 
 #### 공기저항에 의한 낙하물체(Friction)
+https://user-images.githubusercontent.com/98207579/158176845-6172e641-97bd-4e3c-9bd2-866bad028722.mp4
+
 
 ## processing
 
