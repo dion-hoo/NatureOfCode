@@ -18,6 +18,8 @@
 -   [ ] 뉴럴 네트워크
 -   [ ] 프로세싱 기초
 
+#### 공기저항에 의한 낙하물체(Friction)
+
 ## processing
 
 프로세싱 기반 언어를 p5js로 porting한 github주소이다.<br />
