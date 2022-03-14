@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vector</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>
+    <style>
+      canvas {
+        border: 1px dashed deeppink;
+      }
+    </style>
+  </head>
+  <body>
+    <script>
+      let move;
+      const size = 36;
+      class Mover {
+        constructor(position, speed) {
+          this.location = position;
+          this.velocity = speed;
+        }
+        update() {
+          // this.velocity.add(this.acceleration); // 가속도
+          this.location.add(this.velocity);
+        }
+        checkEdges() {
+          if (this.location.x < 0) {
+            this.location.x = width;
+          } else if (this.location.x > width) {
+            this.location.x = 0;
+          }
+
+          if (this.location.y < 0) {
+            this.location.y = height;
+          } else if (this.location.y > height) {
+            this.location.y = 0;
+          }
+        }
+        display() {
+          stroke(0);
+          fill(175);
+          ellipse(this.location.x, this.location.y, size);
+        }
+      }
+
+      function setup() {
+        createCanvas(600, 400);
+
+        noStroke();
+
+        let location = createVector(random(width), random(height));
+        let velocity = createVector(random(10), random(5));
+
+        move = new Mover(location, velocity);
+      }
+
+      function draw() {
+        background(0);
+
+        move.checkEdges();
+        move.update();
+        move.display();
+      }
+    </script>
+  </body>
+</html>

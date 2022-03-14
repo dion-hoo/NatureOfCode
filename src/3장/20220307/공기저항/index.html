@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vector</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>
+    <style>
+      canvas {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        /* border: 1px dashed deeppink; */
+      }
+    </style>
+  </head>
+  <body>
+    <script>
+      let mover = [],
+        liquid;
+
+      class Liquid {
+        constructor(x, y, width, height, c) {
+          this.x = x;
+          this.y = y;
+          this.w = width;
+          this.h = height;
+          this.c = c;
+        }
+
+        inside(mover) {
+          if (
+            mover.location.x > this.x &&
+            mover.location.x < this.x + this.w &&
+            mover.location.y > this.y &&
+            mover.location.y < this.y + this.h
+          ) {
+            return true;
+          }
+        }
+
+        drag(mover) {
+          const speed = mover.velocity.mag();
+          const drag = mover.velocity.copy();
+
+          drag.mult(-1);
+          drag.normalize();
+
+          return drag.mult(this.c * sqrt(speed));
+        }
+
+        display() {
+          fill("#627985");
+          rect(this.x, this.y, this.w, this.h);
+        }
+      }
+
+      class Mover {
+        constructor(height, mass) {
+          this.mass = mass;
+          this.radius = this.mass * 2;
+          this.location = createVector(random(width), height);
+          this.velocity = createVector(0, 0);
+          this.acceleration = createVector(0, 0);
+        }
+
+        applyForce(force) {
+          const f = p5.Vector.div(force, this.mass);
+          this.acceleration.add(f);
+        }
+
+        update() {
+          this.velocity.add(this.acceleration);
+          this.location.add(this.velocity);
+          this.acceleration.mult(0);
+        }
+
+        display() {
+          fill("rgba(0, 0, 0, 0.3)");
+          ellipse(this.location.x, this.location.y, this.radius);
+        }
+
+        checkEdge() {
+          if (this.location.y > height - this.radius / 2) {
+            this.location.y = height - this.radius / 2;
+            this.velocity.y *= -0.8;
+          }
+        }
+      }
+      function setup() {
+        createCanvas(640, 360);
+
+        noStroke();
+
+        for (let i = 0; i < 2; i++) {
+          const h = random(10, height * 0.5);
+          const mass = random(10, 30);
+
+          mover.push(new Mover(h, mass));
+        }
+
+        liquid = new Liquid(0, height * 0.3, width, height * 0.4, 9);
+      }
+
+      function draw() {
+        background("#ccc");
+
+        liquid.display();
+
+        for (let move of mover) {
+          if (liquid.inside(move)) {
+            const fraction = liquid.drag(move);
+
+            move.applyForce(fraction);
+          }
+
+          const gravity = createVector(0, 0.6 * move.mass);
+
+          move.applyForce(gravity);
+          move.update();
+          move.display();
+          move.checkEdge();
+        }
+      }
+    </script>
+  </body>
+</html>

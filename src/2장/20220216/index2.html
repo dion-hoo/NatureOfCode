@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vector</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>
+    <style>
+      canvas {
+        border: 1px dashed deeppink;
+      }
+    </style>
+  </head>
+  <body>
+    <script>
+      let location2 = null;
+      let velocity = null;
+      let size = 40; // size
+
+      class Vector {
+        constructor(x, y) {
+          this.x = x;
+          this.y = y;
+        }
+
+        add(v) {
+          this.x += v.x;
+          this.y += v.y;
+        }
+      }
+
+      function setup() {
+        createCanvas(600, 400);
+
+        noStroke();
+        fill("red");
+
+        location2 = new Vector(width / 2, height / 2);
+        velocity = new Vector(10, 10);
+      }
+
+      function draw() {
+        background(0);
+
+        location2.add(velocity);
+
+        if (location2.x < size / 2 || location2.x >= width - size / 2) {
+          velocity.x *= -1;
+        }
+
+        if (location2.y <= size / 2 || location2.y >= height - size / 2) {
+          velocity.y *= -1;
+        }
+
+        ellipse(location2.x, location2.y, 40);
+      }
+    </script>
+  </body>
+</html>

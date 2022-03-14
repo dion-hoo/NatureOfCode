@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>
+    <style>
+      canvas {
+        border: 1px dashed deeppink;
+      }
+    </style>
+  </head>
+  <body>
+    <script>
+      let walker;
+
+      function setup() {
+        createCanvas(600, 600);
+
+        background(200);
+
+        walker = new Walker();
+      }
+
+      function draw() {
+        walker.step();
+        walker.render();
+      }
+
+      class Walker {
+        constructor() {
+          this.x = width / 2;
+          this.y = height / 2;
+        }
+
+        step() {
+          let r = random(1);
+
+          if (r < 0.4) {
+            this.x -= randomGaussian(10, 5);
+          } else if (r < 0.6) {
+            this.x += randomGaussian(10);
+          } else if (r < 0.8) {
+            this.y += randomGaussian(10);
+          } else {
+            this.y -= randomGaussian(10);
+          }
+
+          this.x = constrain(this.x, 0, width);
+          this.y = constrain(this.y, 0, height);
+        }
+
+        render() {
+          strokeWeight(10);
+          point(this.x, this.y);
+        }
+      }
+    </script>
+  </body>
+</html>

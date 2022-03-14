@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vector</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>
+    <style>
+      canvas {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border: 1px dashed deeppink;
+      }
+    </style>
+  </head>
+  <body>
+    <script>
+      let mover = [];
+
+      class Mover {
+        constructor(mass) {
+          this.mass = mass;
+          this.radius = this.mass * 8;
+          this.location = createVector(width / 2, this.radius);
+          this.veloctiy = createVector(0, 0);
+          this.acceleration = createVector(0, 0);
+        }
+
+        applyForce(force) {
+          // 뉴턴의 운동 제2법칙
+          // 가속도 = 힘 / 질량
+          const f = p5.Vector.div(force, this.mass);
+          this.acceleration.add(f);
+        }
+
+        update() {
+          this.veloctiy.add(this.acceleration);
+          this.location.add(this.veloctiy);
+          this.acceleration.mult(0); // 0으로 초기화 해준 이유는?
+        }
+
+        draw() {
+          fill(`rgb(${this.mass} * 10, 20, 255)`);
+          ellipse(this.location.x, this.location.y, this.radius * 2);
+        }
+
+        checkEdge() {
+          if (this.location.x > width - this.radius - 1) {
+            this.veloctiy.x *= -1;
+          }
+          if (this.location.y > height - this.radius) {
+            this.location.y = height - this.radius;
+            this.veloctiy.y *= -0.9;
+          }
+        }
+      }
+
+      function setup() {
+        createCanvas(640, 360);
+
+        noStroke();
+
+        for (let i = 0; i < 1; i++) {
+          const mass = random(1, 5);
+          mover.push(new Mover(mass));
+        }
+      }
+
+      function draw() {
+        background(0);
+
+        const wind = createVector(0.03, 0);
+        const gravity = createVector(0, 1);
+
+        for (let move of mover) {
+          // move.applyForce(wind);
+          move.applyForce(gravity);
+          move.checkEdge();
+          move.update();
+          move.draw();
+        }
+      }
+    </script>
+  </body>
+</html>

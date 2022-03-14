@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vector</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>
+    <style>
+      canvas {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border: 1px dashed deeppink;
+      }
+    </style>
+  </head>
+  <body>
+    <script>
+      let mover;
+      class Mover {
+        constructor() {
+          this.location = createVector(width / 2, height / 2);
+          this.radius = 50;
+          this.mass = 10;
+        }
+
+        force(force) {
+          //const f = p5.Vector.div(force, this.mass);
+          // const f = force.div(this.mass);
+
+          const fo = force.copy();
+          const f = fo.div(this.mass);
+
+          console.log("2");
+          console.log(f);
+        }
+
+        display() {
+          fill("#fff");
+          ellipse(this.location.x, this.location.y, this.radius * 2);
+        }
+      }
+      function setup() {
+        createCanvas(640, 360);
+
+        noLoop();
+
+        mover = new Mover();
+      }
+
+      function draw() {
+        background(0);
+
+        const gravity = createVector(0, 1); // object
+
+        console.log("1");
+        console.log(gravity);
+
+        mover.force(gravity);
+        mover.display();
+
+        console.log("3");
+        console.log(gravity);
+      }
+    </script>
+  </body>
+</html>

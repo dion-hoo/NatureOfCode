@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vector</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>
+    <style>
+      canvas {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border: 1px dashed deeppink;
+      }
+    </style>
+  </head>
+  <body>
+    <script>
+      let mover = [];
+      class Mover {
+        constructor(m) {
+          this.mass = m;
+          this.radius = this.mass * 2;
+          this.location = createVector(random(0, width), -this.radius * 2);
+          this.velocity = createVector(0, 0);
+          this.acceleration = createVector(0, 0);
+        }
+
+        applyForce(force) {
+          const f = p5.Vector.div(force, this.mass);
+          this.acceleration.add(f);
+        }
+
+        update() {
+          this.velocity.add(this.acceleration);
+          this.location.add(this.velocity);
+          this.acceleration.mult(0);
+        }
+
+        checkEdge() {
+          if (this.location.x > width - this.radius - 2) {
+            this.velocity.x *= -1;
+          }
+
+          if (this.location.y > height - this.radius - 2) {
+            this.location.y = height - this.radius;
+            this.velocity.y *= -0.7;
+          }
+        }
+
+        display() {
+          fill("rgba(255, 255, 255, 0.5)");
+          ellipse(this.location.x, this.location.y, this.radius * 2);
+        }
+      }
+      function setup() {
+        createCanvas(640, 460);
+
+        noStroke();
+
+        for (let i = 0; i < 10; i++) {
+          const mass = random(5, 8);
+          mover.push(new Mover(mass));
+        }
+      }
+
+      function draw() {
+        background("#1e8ded");
+
+        fill("#627985");
+        rect(0, height * 0.2, width, height * 0.4);
+
+        for (let move of mover) {
+          if (
+            move.location.y > height * 0.2 &&
+            move.location.y < height * 0.6
+          ) {
+            let speed = move.velocity.mag();
+            let u = 0.5 * speed * speed; // 마찰 계수
+            let N = 1; // 수직력
+
+            const fraction = move.velocity.copy(); // 기존 속도에 영향을 주지 않게 하기 위해서 복사한다.
+            fraction.mult(-1);
+            fraction.normalize();
+
+            fraction.mult(u * N);
+
+            move.applyForce(fraction);
+          }
+
+          const gravity = createVector(0, 0.1 * move.mass);
+          move.applyForce(gravity);
+
+          move.checkEdge();
+          move.update();
+          move.display();
+        }
+      }
+    </script>
+  </body>
+</html>

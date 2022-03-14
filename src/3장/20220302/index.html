@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vector</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>
+    <style>
+      canvas {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border: 1px dashed deeppink;
+      }
+    </style>
+  </head>
+  <body>
+    <script>
+      let y = 0,
+        size = 50,
+        t = 1,
+        move;
+      class Mover {
+        constructor() {
+          this.location = createVector(width / 2, 0); // position
+          this.velocity = createVector(0, 0); // speed
+          this.accelerataion = createVector(0, 0); // more more speed
+        }
+
+        applyForce(force) {
+          this.accelerataion.add(force);
+        }
+
+        update() {
+          this.velocity.add(this.accelerataion);
+          this.location.add(this.velocity);
+          this.accelerataion.mult(0);
+        }
+
+        checkEdge() {
+          if (this.location.y + this.velocity.y + size > height) {
+          }
+        }
+
+        display() {
+          ellipse(this.location.x, this.location.y, size);
+        }
+      }
+      function setup() {
+        createCanvas(windowWidth, windowHeight);
+
+        noStroke();
+        fill("white");
+
+        move = new Mover();
+      }
+
+      function draw() {
+        background(0);
+
+        if (mouseIsPressed) {
+          const wind = createVector(map(noise(t), 0, 1, -0.5, 0.5), 0.1);
+          move.applyForce(wind);
+        }
+
+        const gravity = createVector(0, 0.5);
+        move.applyForce(gravity);
+
+        move.update();
+        move.display();
+        move.checkEdge();
+
+        t += 0.001;
+      }
+    </script>
+  </body>
+</html>

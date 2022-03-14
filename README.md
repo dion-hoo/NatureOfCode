@@ -1,6 +1,6 @@
 # NatureOfCode
 
-1. Nature of Code 자연계 법칙을 디지털 세계로 옮기는 프로그래밍 전략
+1. [Nature of Code](https://natureofcode.com/) 자연계 법칙을 디지털 세계로 옮기는 프로그래밍 전략
 
 -   한번에 절대 이해 못하기 때문에 두세번 볼것!
 
