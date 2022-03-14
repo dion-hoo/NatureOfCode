@@ -7,7 +7,7 @@
 ---
 
 -   [x] 벡터
--   [ ] 힘 - <span style="background-color: #dcffe4">STUDYING</span>
+-   [ ] 힘 - <span style="color: #dcffe4; font-weight:bold">STUDYING</span>
 -   [ ] 진동
 -   [ ] 파티클
 -   [ ] 물리엔진
@@ -18,9 +18,19 @@
 -   [ ] 뉴럴 네트워크
 -   [ ] 프로세싱 기초
 
-#### 공기저항에 의한 낙하물체(Friction)
-https://user-images.githubusercontent.com/98207579/158176845-6172e641-97bd-4e3c-9bd2-866bad028722.mp4
+### 작업 결과
 
+1. 벡터<br/>
+   1-1. 펄린 노이즈에 의한 Random Walk
+
+    <img width="80%" src="https://user-images.githubusercontent.com/98207579/158179635-339b2c20-f04a-4f51-a6b4-635b429d36a4.gif"/>
+
+<br/>
+
+2. 힘<br/>
+
+    2-1. 공기저항에 의한 낙하물체(Friction)
+    <img width="80%" src="https://user-images.githubusercontent.com/98207579/158179688-6655fa8e-0d10-435b-a2ef-9ce4c0fb6891.gif"/>
 
 ## processing
 
