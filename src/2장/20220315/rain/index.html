@@ -41,6 +41,10 @@
                 update() {
                     const velocity = this.velocity.copy();
 
+                    if (this.location.y > height * 0.8) {
+                        this.height -= 1;
+                    }
+
                     velocity.add(this.acceleration);
                     velocity.mult(1, random(0, 2));
 
@@ -94,6 +98,14 @@
                     rainArray[i].applyForce(gravity);
                     rainArray[i].update();
                     rainArray[i].draw();
+
+                    if (rainArray[i].height < 0) {
+                        rainArray.splice(i, 1);
+                    }
+
+                    if (rainArray.length === 0) {
+                        noLoop();
+                    }
                 }
             }
 
