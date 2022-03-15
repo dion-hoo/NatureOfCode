@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Vector</title>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>
+        <style>
+            canvas {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: #fff9ec;
+            }
+        </style>
+    </head>
+    <body>
+        <script>
+            let rainArray = [],
+                pressed;
+
+            class Rain {
+                constructor(hue) {
+                    this.location = createVector(random(0, width), height * random(-0.2, 0.1));
+                    this.velocity = createVector(0, 10);
+                    this.acceleration = createVector(0, 0);
+                    this.width = 0.3;
+                    this.height = random(0.2, 20);
+                    this.hue = constrain(hue, 0, 255);
+                }
+
+                applyForce(force) {
+                    const f = p5.Vector.div(force, this.height);
+
+                    this.acceleration.add(f);
+                }
+
+                update() {
+                    const velocity = this.velocity.copy();
+
+                    velocity.add(this.acceleration);
+                    velocity.mult(1, random(0, 2));
+
+                    this.location.add(velocity);
+                    this.acceleration.mult(0);
+                }
+
+                draw() {
+                    fill(this.hue, 100, 50);
+                    rect(this.location.x, this.location.y, this.width, this.height);
+                }
+            }
+
+            function setup() {
+                createCanvas(windowWidth, windowHeight);
+                frameRate(16);
+                colorMode(HSL);
+                noStroke();
+
+                for (let i = 0; i < 255; i++) {
+                    rainArray.push(new Rain(55));
+                }
+            }
+
+            function draw() {
+                background('#000');
+                for (let i = 0; i < rainArray.length; i++) {
+                    if (pressed) {
+                        // 마찰력
+                        const speed = rainArray[i].velocity.mag();
+                        const N = 1;
+                        const s = N * speed * speed;
+
+                        const drag = rainArray[i].velocity.copy();
+
+                        drag.normalize();
+                        drag.mult(-1);
+
+                        drag.mult(s);
+
+                        rainArray[i].applyForce(drag);
+
+                        // 바람
+                        const wind = createVector(2, 0);
+
+                        rainArray[i].applyForce(wind);
+                    }
+
+                    const gravity = createVector(0, 0.2);
+
+                    rainArray[i].applyForce(gravity);
+                    rainArray[i].update();
+                    rainArray[i].draw();
+                }
+            }
+
+            function mousePressed() {
+                pressed = true;
+            }
+
+            function mouseReleased() {
+                pressed = false;
+            }
+        </script>
+    </body>
+</html>

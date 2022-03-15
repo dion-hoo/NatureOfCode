@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Vector</title>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>
+        <style>
+            canvas {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                border: 1px dashed deeppink;
+            }
+        </style>
+    </head>
+    <body>
+        <script>
+            let mover = [],
+                attractor = [];
+            // 중력 = (G(중력상수) x m1 x m2 / distance x distance) * (m1 -> m2)의 단위벡터 = 크기가 1인 방향만 구한다.
+            class Mover {
+                constructor(x, y, g) {
+                    this.location = createVector(x, y);
+                    this.velocity = createVector(0, 0);
+                    this.acceleration = createVector(0, 0);
+                    this.mass = 1;
+                    this.G = g;
+                }
+
+                applyForce(force) {
+                    const f = force.copy();
+
+                    const force2 = f.div(this.mass);
+
+                    this.acceleration.add(force2);
+                }
+
+                update() {
+                    this.velocity.add(this.acceleration);
+                    this.location.add(this.velocity);
+                    this.acceleration.mult(0);
+                }
+
+                draw() {
+                    fill('#1c9');
+                    ellipse(this.location.x, this.location.y, this.mass * 10);
+                }
+
+                edgeCheck() {
+                    if (this.location.x - this.mass * 15 < 0 || this.location.x > width - this.mass * 1) {
+                        this.velocity.x *= -1;
+                    }
+
+                    if (this.location.y - this.mass * 15 < 0 || this.location.y > height - this.mass * 1) {
+                        this.velocity.y *= -1;
+                    }
+                }
+            }
+
+            class Attractor {
+                constructor(x, y) {
+                    this.location = createVector(x, y);
+                    this.mass = 20;
+                }
+
+                attract(mover) {
+                    const force = p5.Vector.sub(this.location, mover.location);
+                    const distance = force.mag();
+                    const d = constrain(distance, 10, 40);
+                    const strength = (mover.G * mover.mass * this.mass) / (d * d);
+
+                    force.normalize();
+
+                    return force.mult(strength);
+                }
+
+                draw() {
+                    fill('#fff');
+                    ellipse(this.location.x, this.location.y, this.mass * 2);
+                }
+            }
+
+            function setup() {
+                createCanvas(640, 360);
+
+                noStroke();
+
+                for (let i = 0; i < 5; i++) {
+                    const x = random(15, width - 15);
+                    const y = random(15, height - 15);
+                    const G = random(0.1, 4);
+
+                    const ax = random(15, width - 15);
+                    const ay = random(15, height - 15);
+
+                    mover.push(new Mover(x, y, G));
+                    attractor.push(new Attractor(ax, ay));
+                }
+            }
+
+            function draw() {
+                background('#fff');
+
+                for (let attract of attractor) {
+                    attract.draw();
+                }
+
+                for (let move of mover) {
+                    const f = attractor[0].attract(move);
+
+                    move.applyForce(f);
+                    move.update();
+                    move.edgeCheck();
+
+                    move.draw();
+                }
+            }
+        </script>
+    </body>
+</html>
