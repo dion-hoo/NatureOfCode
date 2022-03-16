@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Vector</title>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>
+        <style>
+            canvas {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: #fff9ec;
+            }
+        </style>
+    </head>
+    <body>
+        <script>
+            let mover = [],
+                mousePointer;
+            pressed = false;
+
+            class MousePointer {
+                constructor() {
+                    this.location = createVector(0, 0);
+                    this.mass = 30;
+                }
+
+                update(x, y) {
+                    this.location.x = x;
+                    this.location.y = y;
+                }
+
+                attract(mover) {
+                    const G = 0.09;
+                    const force = p5.Vector.sub(this.location, mover.location);
+                    const distance = force.mag(); // 크기만
+
+                    const d = constrain(distance, 10, 30000);
+
+                    const f = (G * mover.mass * this.mass) / sqrt(d);
+
+                    force.normalize(); // 방향만
+                    force.mult(f);
+
+                    return force;
+                }
+            }
+
+            class Mover {
+                constructor(mass, width, height) {
+                    this.location = createVector(width, height);
+                    this.velocity = createVector(0, 0);
+                    this.acceleration = createVector(0, 0);
+                    this.mass = mass;
+                }
+
+                applyForce(force) {
+                    const f = p5.Vector.div(force, this.mass);
+
+                    this.acceleration.add(f);
+                }
+
+                attract(mover) {
+                    const G = 0.01;
+                    const force = p5.Vector.sub(this.location, mover.location);
+                    const distance = force.mag(); // 크기만
+
+                    const d = constrain(distance, 10, 30000);
+
+                    const f = (G * mover.mass * this.mass) / sqrt(d);
+
+                    force.normalize(); // 방향만
+                    force.mult(-1);
+                    force.mult(f);
+
+                    return force;
+                }
+
+                update() {
+                    this.velocity.add(this.acceleration);
+                    this.location.add(this.velocity);
+
+                    this.acceleration.mult(0);
+                }
+
+                draw() {
+                    fill('#1c9');
+                    ellipse(this.location.x, this.location.y, this.mass * 10);
+                }
+
+                checkEdge() {
+                    if (this.location.x - this.mass * 5 < 0) {
+                        this.location.x = this.mass * 5;
+                        this.velocity.x *= -1;
+                    }
+
+                    if (this.location.x > width - this.mass * 5) {
+                        this.location.x = width - this.mass * 5;
+                        this.velocity.x *= -1;
+                    }
+
+                    if (this.location.y - this.mass * 5 < 0) {
+                        this.velocity.y *= -1;
+                        this.location.y = this.mass * 5;
+                    }
+
+                    if (this.location.y > height - this.mass * 5) {
+                        this.velocity.y *= -1;
+                        this.location.y = height - this.mass * 5;
+                    }
+                }
+            }
+            function setup() {
+                createCanvas(windowWidth, windowHeight);
+                noStroke();
+
+                for (let i = 0; i < 5; i++) {
+                    const mass = random(5, 8);
+                    const w = random(width);
+                    const h = random(height);
+
+                    mover.push(new Mover(mass, w, h));
+                }
+
+                mousePointer = new MousePointer();
+            }
+
+            function draw() {
+                background('#000');
+
+                for (let i = 0; i < mover.length; i++) {
+                    for (let j = 0; j < mover.length; j++) {
+                        if (i !== j) {
+                            const force = mover[j].attract(mover[i]);
+
+                            mover[i].applyForce(force);
+                        }
+                    }
+
+                    if (pressed) {
+                        const force = mousePointer.attract(mover[i]);
+
+                        mover[i].applyForce(force);
+                    }
+
+                    mover[i].checkEdge();
+                    mover[i].update();
+                    mover[i].draw();
+                }
+            }
+
+            function mousePressed() {
+                mousePointer.update(mouseX, mouseY);
+                pressed = true;
+            }
+
+            function mouseReleased() {
+                pressed = false;
+            }
+        </script>
+    </body>
+</html>
