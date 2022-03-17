@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Vector</title>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>
+        <style>
+            canvas {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: #fff9ec;
+            }
+        </style>
+    </head>
+    <body>
+        <script>
+            let mover;
+            class Mover {
+                constructor() {
+                    this.location = createVector(width / 2, height / 2);
+                    this.velocity = createVector(0, 0);
+                    this.acceleration = createVector(10, 4);
+                    this.mass = 10;
+
+                    this.angle = 0;
+                    this.aVelocity = 0;
+                    this.aAcceleration = 0;
+                }
+
+                update() {
+                    this.velocity.add(this.acceleration);
+                    this.location.add(this.velocity);
+
+                    this.aAcceleration = this.acceleration.x / 10;
+                    this.aVelocity += this.aAcceleration;
+
+                    this.aVelocity = constrain(this.aVelocity, -0.1, 0.1);
+
+                    this.angle += this.aVelocity;
+
+                    this.acceleration.mult(0);
+                }
+
+                checkEdge() {
+                    if (this.location.x - this.mass * 8 < 0 || this.location.x > width - this.mass * 8) {
+                        this.velocity.x *= -1;
+                        this.aVelocity *= -1;
+                    }
+
+                    if (this.location.y - this.mass * 8 < 0 || this.location.y > height - this.mass * 8) {
+                        this.velocity.y *= -1;
+                        this.aVelocity *= -1;
+                    }
+                }
+
+                draw() {
+                    push();
+
+                    rectMode(CENTER);
+                    translate(this.location.x, this.location.y);
+                    rotate(this.angle);
+                    rect(0, 0, this.mass * 16, this.mass * 16);
+
+                    pop();
+                }
+            }
+
+            function setup() {
+                createCanvas(windowWidth, windowHeight);
+                stroke('#fff');
+
+                fill(175, 200);
+
+                mover = new Mover();
+            }
+
+            function draw() {
+                background('#000');
+
+                mover.checkEdge();
+                mover.update();
+                mover.draw();
+            }
+        </script>
+    </body>
+</html>
