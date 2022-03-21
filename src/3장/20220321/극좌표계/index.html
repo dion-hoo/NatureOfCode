@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Vector</title>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>
+        <style>
+            canvas {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: #fff9ec;
+            }
+        </style>
+    </head>
+    <body>
+        <!-- 극좌표계란? 원점에서 각도와 거리로 좌표를 나타내는 것을 말한다.
+        직교 좌표계란? 흔히 사용하는 x좌표, y좌표를 말한다. -->
+        <script>
+            let mover;
+            let r = 20;
+            let theta = 0;
+            class Mover {
+                constructor() {
+                    this.size = 3;
+                }
+
+                draw() {
+                    let x = r * cos(theta);
+                    let y = r * sin(theta);
+
+                    ellipse(x + width / 2, y + height / 2, this.size);
+
+                    if (int(theta % 6) === 0) {
+                        r += 0.1;
+                    }
+
+                    theta += 0.01;
+                }
+            }
+            function setup() {
+                createCanvas(windowWidth, windowHeight);
+
+                noStroke();
+                fill('#fff');
+
+                mover = new Mover();
+
+                background('#000');
+            }
+
+            function draw() {
+                mover.draw();
+            }
+        </script>
+    </body>
+</html>
