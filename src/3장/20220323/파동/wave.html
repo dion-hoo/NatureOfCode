@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Vector</title>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>
+        <style>
+            canvas {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: #fff9ec;
+            }
+        </style>
+    </head>
+    <body>
+        <script>
+            let wave1, wave2;
+            class Wave {
+                constructor(aVelocity, amplitude) {
+                    this.location = createVector(0, 0);
+                    this.angle = createVector(0, 0);
+                    this.aVelocity = createVector(aVelocity.x, aVelocity.y);
+                    this.amplitude = createVector(amplitude.x, amplitude.y);
+                }
+
+                update() {
+                    this.location.x = cos(this.angle.x) * this.amplitude.x;
+                    this.location.y = cos(this.angle.y) * this.amplitude.y;
+
+                    this.angle.add(this.aVelocity);
+                }
+
+                draw() {
+                    push();
+                    translate(width / 2, height / 2);
+                    ellipse(this.location.x, this.location.y, 48);
+                    pop();
+                }
+            }
+            function setup() {
+                createCanvas(windowWidth, windowHeight);
+
+                stroke('#1c9');
+                noFill();
+
+                wave1 = new Wave({ x: 0.05, y: 0.2 }, { x: width * 0.2, y: 100 });
+                wave2 = new Wave({ x: 0.01, y: 0.03 }, { x: 500, y: 200 });
+            }
+
+            function draw() {
+                background('#000');
+
+                for (let i = 0; i < 20; i++) {
+                    wave1.update();
+                    wave1.draw();
+                }
+
+                for (let i = 0; i < 10; i++) {
+                    wave2.update();
+                    wave2.draw();
+                }
+            }
+        </script>
+    </body>
+</html>
