@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Vector</title>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>
+        <style>
+            canvas {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: #fff9ec;
+            }
+        </style>
+    </head>
+    <body>
+        <script>
+            let letter = [],
+                pendulm = [],
+                fontColor = 0;
+
+            const words = [
+                'A',
+                'B',
+                'C',
+                'D',
+                'F',
+                'G',
+                'H',
+                'I',
+                'J',
+                'K',
+                'L',
+                'M',
+                'N',
+                'O',
+                'P',
+                'Q',
+                'R',
+                'S',
+                'T',
+                'U',
+                'V',
+                'W',
+                'X',
+                'Y',
+                'Z',
+            ];
+            class Letter {
+                constructor(word, fontColor) {
+                    this.location = createVector(random(width), random(-50, 0));
+                    this.velocity = createVector(0, 0);
+                    this.acceleration = createVector(0, random(0.01, 0.03));
+                    this.color = color(fontColor, 130, 100);
+                    this.word = word;
+                    this.rotate = radians(45);
+                }
+
+                update() {
+                    this.velocity.add(this.acceleration);
+                    this.location.add(this.velocity);
+
+                    if (this.location.y > height) {
+                        this.location.y = height;
+                        this.velocity.y *= -0.8;
+                    }
+                }
+
+                draw() {
+                    push();
+                    textStyle(BOLD);
+                    textSize(35);
+                    stroke(this.color);
+                    fill(this.color);
+
+                    // rotate(this.rotate);
+                    text(this.word, this.location.x, this.location.y);
+                    pop();
+                }
+            }
+            class Pendulm {
+                constructor(wdith, height, r) {
+                    this.r = r;
+                    this.angle = PI * 3.2;
+                    this.aVelocity = 0;
+                    this.aAcceleration = 0;
+
+                    this.origin = createVector(wdith, height);
+                    this.location = createVector(0, 0);
+
+                    this.damping = 0.9999;
+                }
+
+                bouncing(object) {
+                    let G = 1;
+
+                    if (object.location.y - this.location.y) {
+                    }
+                }
+
+                update() {
+                    let gravity = 0;
+
+                    this.aAcceleration = 1 * (gravity / this.r) * sin(this.angle);
+
+                    this.aVelocity += this.aAcceleration;
+                    this.angle += this.aVelocity;
+
+                    this.aVelocity *= this.damping;
+                }
+
+                draw() {
+                    this.location.set(this.r * sin(this.angle), this.r * cos(this.angle));
+                    this.location.add(this.origin);
+
+                    push();
+                    stroke('#fff');
+                    strokeWeight(3);
+
+                    beginShape();
+                    vertex(this.origin.x - this.r * 0.004, this.origin.y);
+                    vertex(this.origin.x + this.r * 0.004, this.origin.y);
+                    vertex(this.location.x, this.location.y);
+                    vertex(this.location.x, this.location.y);
+                    endShape();
+
+                    line(this.origin.x, this.origin.y, this.location.x, this.location.y);
+
+                    pop();
+                }
+            }
+
+            function setup() {
+                createCanvas(windowWidth, windowHeight);
+
+                pendulm.push(new Pendulm(width / 2, height, height * 0.8));
+
+                for (let i = 0; i < 200; i++) {
+                    letter.push(new Letter(random(words), fontColor));
+
+                    fontColor++;
+
+                    if (fontColor > 255) {
+                        fontColor = 0;
+                    }
+                }
+            }
+
+            function draw() {
+                background('#000');
+
+                // letter
+                for (let l of letter) {
+                    l.update();
+                    l.draw();
+                }
+
+                for (let p of pendulm) {
+                    p.update();
+                    p.draw();
+                }
+            }
+        </script>
+    </body>
+</html>
