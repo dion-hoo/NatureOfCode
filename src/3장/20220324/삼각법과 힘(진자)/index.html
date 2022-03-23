@@ -85,7 +85,7 @@
             class Pendulm {
                 constructor(wdith, height, r) {
                     this.r = r;
-                    this.angle = PI * 3.2;
+                    this.angle = PI / 2;
                     this.aVelocity = 0;
                     this.aAcceleration = 0;
 
@@ -103,7 +103,7 @@
                 }
 
                 update() {
-                    let gravity = 0;
+                    let gravity = 0.2;
 
                     this.aAcceleration = 1 * (gravity / this.r) * sin(this.angle);
 
