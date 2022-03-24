@@ -65,8 +65,8 @@
                     this.location.add(this.velocity);
 
                     if (this.location.y > height) {
-                        this.location.y = height;
-                        this.velocity.y *= -0.8;
+                        this.location.y = 0;
+                        this.velocity.y = 0;
                     }
                 }
 
@@ -105,7 +105,7 @@
                 update() {
                     let gravity = 0.2;
 
-                    this.aAcceleration = 1 * (gravity / this.r) * sin(this.angle);
+                    this.aAcceleration = (gravity / this.r) * sin(this.angle);
 
                     this.aVelocity += this.aAcceleration;
                     this.angle += this.aVelocity;
@@ -128,8 +128,6 @@
                     vertex(this.location.x, this.location.y);
                     endShape();
 
-                    line(this.origin.x, this.origin.y, this.location.x, this.location.y);
-
                     pop();
                 }
             }
@@ -139,7 +137,7 @@
 
                 pendulm.push(new Pendulm(width / 2, height, height * 0.8));
 
-                for (let i = 0; i < 200; i++) {
+                for (let i = 0; i < 80; i++) {
                     letter.push(new Letter(random(words), fontColor));
 
                     fontColor++;

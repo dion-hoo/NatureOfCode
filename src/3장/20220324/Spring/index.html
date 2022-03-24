@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Vector</title>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>
+        <style>
+            canvas {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: #fff9ec;
+            }
+        </style>
+    </head>
+    <body>
+        <script>
+            let bob, spring;
+            class Bob {
+                constructor() {
+                    this.location = createVector(width * 0.5, height * 0.5);
+                    this.velocity = createVector(0, 0);
+                    this.acceleration = createVector(0, 0);
+                    this.radius = 40;
+                    this.damping = 0.99;
+                }
+
+                applyForce(force) {
+                    let f = p5.Vector.div(force, this.radius);
+                    this.acceleration.add(f);
+                }
+
+                update() {
+                    this.velocity.add(this.acceleration);
+                    this.location.add(this.velocity);
+                    this.acceleration.mult(0);
+
+                    if (this.location.y > height - this.radius / 2) {
+                        this.location.y = height - this.radius / 2;
+                        this.velocity.y *= -this.damping;
+                    }
+                }
+
+                draw() {
+                    ellipse(this.location.x, this.location.y, this.radius);
+                }
+            }
+            class Spring {
+                constructor() {
+                    this.anchor = createVector(width * 0.5, height * 0.3); // 고정 지점
+                    this.length = height * 0.4; // 기본길이
+                    this.K = 0.1; // 용수철의 탄성 상수
+                }
+
+                conntect(bob) {
+                    let force = p5.Vector.sub(bob.location, this.anchor);
+                    let currentLength = force.mag();
+                    let x = currentLength - this.length;
+
+                    force.normalize();
+                    force.mult(-1 * this.K * x);
+
+                    bob.applyForce(force);
+                }
+
+                draw(bob) {
+                    line(this.anchor.x, this.anchor.y, bob.location.x, bob.location.y);
+                }
+            }
+
+            function setup() {
+                createCanvas(windowWidth, windowHeight);
+
+                stroke(175);
+                fill(175);
+
+                bob = new Bob();
+                spring = new Spring();
+            }
+
+            function draw() {
+                background('#000');
+
+                const gravity = createVector(0, 0.01);
+                bob.applyForce(gravity);
+
+                spring.conntect(bob);
+                spring.draw(bob);
+
+                bob.update();
+                bob.draw();
+            }
+        </script>
+    </body>
+</html>
