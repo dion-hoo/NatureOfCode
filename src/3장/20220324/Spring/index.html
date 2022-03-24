@@ -22,11 +22,15 @@
             let bob, spring;
             class Bob {
                 constructor() {
+                    this.origin = createVector(width * 0.5, height * 0.5);
                     this.location = createVector(width * 0.5, height * 0.5);
                     this.velocity = createVector(0, 0);
                     this.acceleration = createVector(0, 0);
-                    this.radius = 40;
+                    this.radius = 90;
                     this.damping = 0.99;
+                    this.angle = PI / 2;
+                    this.aVelocity = 0;
+                    this.aAcceleration = 0;
                 }
 
                 applyForce(force) {
@@ -34,10 +38,16 @@
                     this.acceleration.add(f);
                 }
 
-                update() {
+                update(gravity) {
                     this.velocity.add(this.acceleration);
                     this.location.add(this.velocity);
                     this.acceleration.mult(0);
+
+                    // this.aAcceleration = -1 * gravity.y * sin(this.angle);
+
+                    // this.aVelocity += this.aAcceleration;
+                    // this.angle += this.aVelocity;
+                    // this.aVelocity *= this.damping;
 
                     if (this.location.y > height - this.radius / 2) {
                         this.location.y = height - this.radius / 2;
@@ -46,6 +56,12 @@
                 }
 
                 draw() {
+                    // let x = this.radius * sin(this.angle);
+                    // let y = this.radius * cos(this.angle);
+
+                    // this.location.set(x, y);
+                    // this.location.add(this.origin);
+
                     ellipse(this.location.x, this.location.y, this.radius);
                 }
             }
@@ -91,7 +107,7 @@
                 spring.conntect(bob);
                 spring.draw(bob);
 
-                bob.update();
+                bob.update(gravity);
                 bob.draw();
             }
         </script>
