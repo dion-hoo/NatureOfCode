@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Vector</title>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>
+        <style>
+            canvas {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: #fff9ec;
+            }
+        </style>
+    </head>
+    <body>
+        <script>
+            let particle = [];
+            let ps;
+
+            class ParticleStystem {
+                constructor() {
+                    this.particles = [new Particle(createVector(width / 2, height / 2))];
+                }
+
+                addParticle() {
+                    this.particles.push(new Particle(createVector(width / 2, height / 2)));
+                }
+
+                run() {
+                    for (let p of this.particles) {
+                        p.run();
+                        p.isDead();
+                    }
+                }
+            }
+
+            class Particle {
+                constructor(location) {
+                    this.location = location;
+                    this.velocity = createVector(random(-1, 1), random(-2, 0));
+                    this.acceleration = createVector(0, 0.05);
+                    this.radius = 8;
+                    this.lifespan = 255;
+                }
+
+                applyForce(force) {
+                    const f = force.copy();
+                    const result = f.div(this.radius);
+
+                    this.acceleration.add(result);
+                }
+
+                isDead() {
+                    if (this.lifespan < 0) {
+                        const index = particle.indexOf(this);
+                        particle.splice(index, 1);
+                    }
+                }
+
+                run() {
+                    this.update();
+                    this.draw();
+                }
+
+                update() {
+                    this.velocity.add(this.acceleration);
+                    this.location.add(this.velocity);
+
+                    this.acceleration.mult(0);
+
+                    this.lifespan -= 2;
+                }
+
+                draw() {
+                    fill(175, this.lifespan);
+
+                    ellipse(this.location.x, this.location.y, this.radius);
+                }
+            }
+            function setup() {
+                createCanvas(windowWidth, windowHeight);
+
+                noStroke();
+            }
+
+            function draw() {
+                background('#000');
+
+                const gravity = createVector(0, 0.2);
+
+                ps = new ParticleStystem();
+
+                ps.addParticle();
+                ps.run();
+            }
+        </script>
+    </body>
+</html>

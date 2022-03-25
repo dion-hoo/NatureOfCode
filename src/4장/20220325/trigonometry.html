@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Vector</title>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>
+        <style>
+            canvas {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: #fff9ec;
+            }
+        </style>
+    </head>
+    <body>
+        <script>
+            let pendulm;
+
+            class Pendulm {
+                constructor() {
+                    this.origin = createVector(width / 2, height / 2);
+                    this.location = createVector(0, 0);
+
+                    this.r = 200;
+                    this.radius = 50;
+
+                    this.angle = PI / 2;
+                    this.aVelocity = 0;
+                    this.aAcceleration = 0;
+                    this.damping = 0.99;
+                }
+
+                update() {
+                    let G = 0.4;
+
+                    this.aAcceleration = ((-1 * G) / this.r) * sin(this.angle);
+
+                    this.aVelocity += this.aAcceleration;
+                    this.angle += this.aVelocity;
+
+                    this.aVelocity *= this.damping;
+                }
+
+                draw() {
+                    let x = this.r * sin(this.angle);
+                    let y = this.r * cos(this.angle);
+
+                    this.location.set(x, y);
+                    this.location.add(this.origin);
+
+                    line(this.origin.x, this.origin.y, this.location.x, this.location.y);
+                    ellipse(this.location.x, this.location.y, this.radius);
+                }
+            }
+
+            function setup() {
+                createCanvas(windowWidth, windowHeight);
+
+                noStroke();
+
+                stroke(175);
+                fill(175);
+
+                pendulm = new Pendulm();
+            }
+
+            function draw() {
+                background('#000');
+
+                pendulm.update();
+                pendulm.draw();
+            }
+        </script>
+    </body>
+</html>

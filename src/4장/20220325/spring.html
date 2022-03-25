@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Vector</title>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>
+        <style>
+            canvas {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: #fff9ec;
+            }
+        </style>
+    </head>
+    <body>
+        <script>
+            let bob;
+            let spring;
+            class Bob {
+                constructor() {
+                    this.location = createVector(width / 2, random(height * 0.5, height));
+                    this.velocity = createVector(0, 0);
+                    this.acceleration = createVector(0, 0);
+                    this.radius = 50;
+                }
+
+                applyForce(force) {
+                    const f = p5.Vector.div(force, this.radius);
+
+                    this.acceleration.add(f);
+                }
+
+                update() {
+                    this.velocity.add(this.acceleration);
+                    this.location.add(this.velocity);
+                    this.acceleration.mult(0);
+                }
+
+                draw() {
+                    fill(175);
+
+                    ellipse(this.location.x, this.location.y, this.radius);
+                }
+            }
+
+            class Spring {
+                constructor() {
+                    this.anchor = createVector(width / 2, height / 2);
+                    this.lenght = 100; // 기본 길이
+                    this.K = 0.01; // 탄성 상수
+                }
+
+                connect(bob) {
+                    const force = p5.Vector.sub(bob.location, this.anchor);
+                    const currentLenght = force.mag();
+                    const x = currentLenght - this.lenght;
+
+                    force.normalize();
+                    const f = force.mult(-1 * this.K * x);
+
+                    bob.applyForce(f);
+                }
+
+                draw(bob) {
+                    stroke(175);
+                    line(this.anchor.x, this.anchor.y, bob.location.x, bob.location.y);
+                }
+            }
+
+            function setup() {
+                createCanvas(windowWidth, windowHeight);
+
+                noStroke();
+
+                bob = new Bob();
+                spring = new Spring();
+            }
+
+            function draw() {
+                background('#000');
+
+                bob.update();
+                bob.draw();
+
+                spring.connect(bob);
+                spring.draw(bob);
+            }
+        </script>
+    </body>
+</html>
