@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Vector</title>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>
+        <style>
+            canvas {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: #fff9ec;
+            }
+        </style>
+    </head>
+    <body>
+        <script>
+            let ps, repeller;
+
+            class ParticleSystem {
+                constructor(location) {
+                    this.location = location;
+                    this.particles = [];
+                }
+
+                applyRepeller(repeller) {
+                    for (let p of this.particles) {
+                        const force = repeller.repel(p);
+                        p.applyForce(force);
+                    }
+                }
+
+                applyForce(force) {
+                    for (let p of this.particles) {
+                        p.applyForce(force);
+                    }
+                }
+
+                addParticle() {
+                    this.particles.push(new Particle(this.location));
+                }
+
+                run() {
+                    for (let p of this.particles) {
+                        p.run();
+                        if (p.isDead()) {
+                            const index = this.particles.indexOf(this);
+                            this.particles.splice(index, 1);
+                        }
+                    }
+                }
+            }
+
+            class Particle {
+                constructor(location) {
+                    this.location = location;
+                    this.velocity = createVector(random(-1, 1), random(-1, 0));
+                    this.acceleration = createVector(0, 0);
+                    this.lifespan = 255;
+                    this.radius = 10;
+                }
+
+                applyForce(force) {
+                    let f = p5.Vector.div(force, this.radius);
+
+                    this.acceleration.add(f);
+                }
+
+                isDead() {
+                    if (this.lifespan < 0) {
+                        return true;
+                    }
+                }
+
+                update() {
+                    this.velocity.add(this.acceleration);
+                    this.location.add(this.velocity);
+                    this.acceleration.mult(0);
+
+                    this.lifespan -= 2;
+                }
+                draw() {
+                    fill(255, this.lifespan);
+                    ellipse(this.location.x, this.location.y, this.radius);
+                }
+
+                run() {
+                    this.update();
+                    this.draw();
+                }
+            }
+
+            class Repeller {
+                constructor(width, height) {
+                    this.location = createVector(width, height);
+                    this.radius = 40;
+                    this.strength = 100;
+                }
+
+                repel(object) {
+                    const G = 0.03;
+                    const force = p5.Vector.sub(this.location, object.location);
+                    const distance = force.mag();
+                    const d = constrain(distance, 5, 100);
+                    const strength = (1 * G * this.radius * object.radius) / sqrt(d);
+
+                    force.normalize();
+                    force.mult(strength);
+
+                    return force;
+                }
+
+                draw() {
+                    fill('#1c9');
+                    ellipse(this.location.x, this.location.y, this.radius * 2);
+                }
+            }
+
+            function setup() {
+                createCanvas(windowWidth, windowHeight);
+
+                noStroke();
+                fill(175);
+
+                ps = new ParticleSystem(createVector(width / 2, 50));
+                repeller = new Repeller(width / 2 - 20, height / 2);
+            }
+
+            function draw() {
+                background('#000');
+                ps.addParticle();
+
+                const gravity = createVector(0, 0.1);
+                ps.applyForce(gravity);
+                ps.applyRepeller(repeller);
+
+                ps.run();
+                repeller.draw();
+            }
+        </script>
+    </body>
+</html>

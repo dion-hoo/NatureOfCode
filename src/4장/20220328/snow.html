@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Vector</title>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>
+        <style>
+            canvas {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: #fff9ec;
+            }
+        </style>
+    </head>
+    <body>
+        <script>
+            let snow = [];
+            class Snowflake {
+                constructor() {
+                    this.location = createVector(0, random(-50, 0));
+                    this.angle = random(TWO_PI);
+                    this.r = sqrt(random(pow(width / 2, 2)));
+                    this.radius = random(2, 4);
+                }
+
+                update(time) {
+                    let angle = 0.09 * time + this.angle;
+
+                    this.location.x = width / 2 + sin(angle) * this.r;
+                    this.location.y += pow(this.radius, 0.9);
+
+                    if (this.location.y > height) {
+                        const index = snow.indexOf(this);
+
+                        snow.splice(index, 1);
+                    }
+                }
+
+                draw() {
+                    ellipse(this.location.x, this.location.y, this.radius);
+                }
+            }
+            function setup() {
+                createCanvas(windowWidth, windowHeight);
+
+                noStroke();
+                fill('#fff');
+            }
+
+            function draw() {
+                background('#000');
+
+                for (let i = 0; i < 5; i++) {
+                    snow.push(new Snowflake());
+                }
+
+                for (let s of snow) {
+                    s.update(frameCount / 60);
+                    s.draw();
+                }
+            }
+        </script>
+    </body>
+</html>

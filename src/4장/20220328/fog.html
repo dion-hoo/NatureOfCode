@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Vector</title>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>
+        <style>
+            canvas {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: #fff9ec;
+            }
+        </style>
+    </head>
+    <body>
+        <script>
+            let img;
+
+            // function preload() {
+            //     img = loadImage('../../assets/img/transparent.png');
+            // }
+
+            function setup() {
+                createCanvas(windowWidth, windowHeight, P2D);
+
+                blendMode(ADD);
+
+                background(0);
+
+                // imageMode(CENTER);
+                // image(img, 0, 0, 100, 100);
+                // tint(255, 200);
+                // image(img, 100, 100, 100, 100);
+            }
+
+            function draw() {}
+        </script>
+    </body>
+</html>

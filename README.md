@@ -9,8 +9,8 @@
 -   [x] 벡터
 -   [x] 힘
 -   [x] 진동
--   [ ] 파티클 - <span style="color: #dcffe4; font-weight:bold">STUDYING</span>
--   [ ] 물리엔진
+-   [x] 파티클
+-   [ ] 물리엔진 - <span style="color: #dcffe4; font-weight:bold">STUDYING</span>
 -   [ ] 자율 에이전트
 -   [ ] 세포 오토마타
 -   [ ] 프랙털
@@ -20,10 +20,10 @@
 
 ### 작업 결과
 
-1. 벡터<br/>
-   1-1. 펄린 노이즈에 의한 Random Walk
+1.  벡터<br/>
+    1-1. 펄린 노이즈에 의한 Random Walk
 
-       <img width="80%" src="https://user-images.githubusercontent.com/98207579/158179635-339b2c20-f04a-4f51-a6b4-635b429d36a4.gif"/>
+        <img width="80%" src="https://user-images.githubusercontent.com/98207579/158179635-339b2c20-f04a-4f51-a6b4-635b429d36a4.gif"/>
 
 <br/>
 
