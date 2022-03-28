@@ -106,7 +106,7 @@
                     const force = p5.Vector.sub(this.location, object.location);
                     const distance = force.mag();
                     const d = constrain(distance, 5, 100);
-                    const strength = (1 * G * this.radius * object.radius) / sqrt(d);
+                    const strength = (-1 * G * this.radius * object.radius) / sqrt(d);
 
                     force.normalize();
                     force.mult(strength);
