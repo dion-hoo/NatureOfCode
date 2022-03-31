@@ -21,15 +21,29 @@
     </head>
     <body>
         <script>
+            let world;
             function setup() {
                 createCanvas(windowWidth, windowHeight);
 
-                noStroke();
-                box2d = new Pbox2D(this);
+                world = createWorld(new box2d.b2Vec2(0, 0));
+
+                console.log(box2d);
             }
 
             function draw() {
                 background('#000');
+
+                // let timeStep = 1.0 / 30;
+                // world.Step(timeStep, 10, 10);
+
+                // if (mouseIsPressed) {
+                //     let b = new Box(mouseX, mouseY);
+                //     boxes.push(b);
+                // }
+                // // Display all the boxes
+                // for (let i = 0; i < boxes.length; i++) {
+                //     boxes[i].display();
+                // }
             }
         </script>
     </body>
