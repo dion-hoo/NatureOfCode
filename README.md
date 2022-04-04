@@ -23,7 +23,7 @@
 1.  벡터<br/>
     1-1. 펄린 노이즈에 의한 Random Walk
 
-        <img width="80%" src="https://user-images.githubusercontent.com/98207579/158179635-339b2c20-f04a-4f51-a6b4-635b429d36a4.gif"/>
+    <img width="80%" src="https://user-images.githubusercontent.com/98207579/158179635-339b2c20-f04a-4f51-a6b4-635b429d36a4.gif"/>
 
 <br/>
 
