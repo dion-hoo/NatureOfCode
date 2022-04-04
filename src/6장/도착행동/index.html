@@ -26,7 +26,7 @@
                     this.velocity = createVector(0, 0);
                     this.acceleration = createVector(0, 0);
                     this.maxspeed = 4;
-                    this.maxforce = 0.1;
+                    this.maxforce = 2;
                     this.r = 13;
                 }
 
@@ -38,9 +38,15 @@
 
                 seek(target) {
                     const desired = p5.Vector.sub(target, this.location);
+                    const d = desired.mag();
 
                     desired.normalize();
-                    desired.mult(this.maxspeed);
+
+                    if (d < 80) {
+                        desired.mult(d, 0, 80, 0, this.maxspeed);
+                    } else {
+                        desired.mult(this.maxspeed);
+                    }
 
                     const steer = p5.Vector.sub(desired, this.velocity); // 조향력
 
@@ -54,32 +60,21 @@
                     this.velocity.limit(this.maxspeed);
                     this.location.add(this.velocity);
                     this.acceleration.mult(0);
-
-                    if (this.location.y > height - this.radius / 2) {
-                        this.location.y = height - this.radius / 2;
-                        this.velocity.y *= -0.78;
-                    }
                 }
 
                 draw() {
                     let theta = this.velocity.heading() + PI / 2;
-
+                    fill(0);
                     push();
                     translate(this.location.x, this.location.y);
                     rotate(theta);
-                    beginShape();
-                    vertex(0, -this.r * 2);
-                    vertex(-this.r, -this.r * 2);
-                    vertex(this.r, this.r * 2);
-                    endShape(CLOSE);
-                    pop();
+                    polygon(this.location.x, this.location.y, 3, 40);
                 }
             }
             function setup() {
                 createCanvas(windowWidth, windowHeight);
 
                 stroke(175);
-                fill(175);
 
                 vehicle = new Vehicle(width / 2, height / 2);
             }
@@ -87,11 +82,29 @@
             function draw() {
                 background('#000');
 
-                const target = createVector(width / 2 + 230, height / 2 - 100);
+                fill(175);
+                ellipse(mouseX, mouseY, 50);
 
-                vehicle.seek(target);
+                const mouse = createVector(mouseX, mouseY);
+
+                vehicle.seek(mouse);
                 vehicle.update();
                 vehicle.draw();
+            }
+
+            function polygon(x, y, sides, radius) {
+                let angle = TWO_PI / sides;
+
+                pop();
+                beginShape();
+                for (let i = 0; i < sides; i++) {
+                    let px = x + cos(i * angle) * radius;
+                    let py = y + sin(i * angle) * radius;
+
+                    vertex(px, py, 0);
+                }
+                endShape(CLOSE);
+                push();
             }
         </script>
     </body>
