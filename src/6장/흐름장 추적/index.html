@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Vector</title>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>
+        <style>
+            canvas {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: #fff9ec;
+            }
+        </style>
+    </head>
+    <body>
+        <script>
+            let flowField = null;
+            class FlowField {
+                constructor(r) {
+                    this.resolution = r;
+                    this.cols = int(width / this.resolution);
+                    this.rows = int(height / this.resolution);
+                    this.field = create2DArray(this.rows, this.cols);
+
+                    this.init();
+                }
+
+                init() {
+                    let xoff = 0;
+                    for (let i = 0; i < this.cols; i++) {
+                        let yoff = 0;
+                        let theta = map(noise(xoff, yoff), 0, 1, 0, TWO_PI);
+
+                        for (let j = 0; j < this.rows; j++) {
+                            this.field[i][j] = createVector(cos(theta), sin(theta));
+
+                            yoff += 0.1;
+                        }
+
+                        xoff += 0.1;
+                    }
+                }
+
+                lookUp(lookup) {
+                    let col = int(constrain(lookup.x / this.resolution, 0, this.cols - 1));
+                    let row = int(constrain(lookup.y / this.resolution, 0, this.rows - 1));
+
+                    return this.field[col][row].copy();
+                }
+            }
+
+            class Vehicle {
+                constructor() {
+                    this.location = createVector(0, 0);
+                    this.velocity = createVector(0, 0);
+                    this.accleration = createVector(0, 0);
+                    this.mass = 10;
+                    this.maxspeed = 10;
+                    this.maxForce = 3;
+                }
+
+                follow(flow) {
+                    const desired = flow.lookup(this.location);
+
+                    desired.mult(this.maxspeed);
+
+                    const steer = p5.Vector.sub(desired, this.velocity);
+                    steer.limit(this.maxForce);
+
+                    this.applyForce(steer);
+                }
+
+                steer(target) {
+                    const desired = p5.Vector.sub(target, this.location);
+
+                    desired.normalize();
+                    desired.mult(this.maxspeed);
+
+                    const steer = p5.Vector.sub(desired, this.velocity);
+
+                    steer.limit(this.maxForce);
+
+                    this.applyForce(steer);
+                }
+
+                applyForce(force) {
+                    const f = p5.Vector.div(force, this.mass);
+
+                    this.accleration.add(f);
+                }
+
+                update() {
+                    this.velocity.add(this.accleration);
+                    this.velocity.mult(this.maxspeed);
+                    this.location.add(this.velocity);
+                    this.accleration.mult(0);
+                }
+
+                draw() {}
+            }
+
+            function setup() {
+                createCanvas(600, 400);
+
+                stroke(175);
+
+                flowField = new FlowField(10);
+
+                noLoop();
+            }
+
+            function draw() {
+                background('#000');
+
+                fill(175);
+            }
+
+            function create2DArray(rows, columns) {
+                let arr = new Array(rows);
+                for (let i = 0; i < rows; i++) {
+                    arr[i] = new Array(columns);
+                }
+                return arr;
+            }
+        </script>
+    </body>
+</html>

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Document</title>
+        <style>
+            canvas {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: #000;
+            }
+        </style>
+
+        <script src="/p5.min.js"></script>
+    </head>
+    <body>
+        <!-- 벡터의 곱셉과 유사한 내적
+          내적은 두 벡터 사이의 각도를 구하는 것이다.
+        -->
+
+        <script>
+            let line1, line2;
+
+            let v1, v2;
+            let theta = 0;
+
+            class Line {
+                draw(vector) {
+                    push();
+                    translate(width / 2, height / 2);
+                    line(0, 0, vector.x, vector.y);
+                    pop();
+                }
+            }
+
+            function setup() {
+                createCanvas(windowWidth, windowHeight);
+
+                stroke(175);
+
+                line1 = new Line();
+                line2 = new Line();
+            }
+
+            function draw() {
+                background(0);
+
+                v1 = createVector(300, 0);
+                v2 = createVector(mouseX - width / 2, mouseY - height / 2);
+
+                line1.draw(v1);
+                line2.draw(v2);
+
+                textSize(32);
+                fill('#fff');
+                textAlign(CENTER);
+                text(`두 백터 사이의 각도(내적) : ${int(theta)}도`, width / 2, 100);
+            }
+
+            function mouseMoved() {
+                let v1Scalar = v1.mag();
+                let v2Scalar = v2.mag();
+
+                let angle = acos(v1.dot(v2) / (v1Scalar * v2Scalar));
+                theta = angle * (180 / PI);
+            }
+        </script>
+    </body>
+</html>
