@@ -20,7 +20,9 @@
     </head>
     <body>
         <script>
-            let path = null;
+            let vehicle;
+            let path;
+
             class Path {
                 constructor() {
                     this.radius = 20; // 경로의 너비
@@ -29,26 +31,99 @@
                 }
 
                 draw() {
+                    push();
                     strokeWeight(this.radius * 2);
                     stroke(255);
                     line(this.start.x, this.start.y, this.end.x, this.end.y);
                     strokeWeight(1);
                     stroke(0);
                     line(this.start.x, this.start.y, this.end.x, this.end.y);
+                    pop();
+                }
+            }
+
+            class Vehicle {
+                constructor(x, y) {
+                    this.location = createVector(x, y);
+                    this.velocity = createVector(0, 0);
+                    this.acceleration = createVector(0, 0);
+                    this.maxspeed = 14;
+                    this.maxforce = 10;
+                    this.r = 13;
+                }
+
+                applyForce(force) {
+                    const f = p5.Vector.div(force, this.r);
+
+                    this.acceleration.add(f);
+                }
+
+                seek(target) {
+                    const desired = p5.Vector.sub(target, this.location);
+
+                    desired.normalize();
+                    desired.mult(this.maxspeed);
+
+                    const ster = p5.Vector.sub(desired, this.velocity);
+
+                    ster.limit(this.maxforce);
+
+                    this.applyForce(ster);
+                }
+
+                update() {
+                    this.velocity.add(this.acceleration);
+                    this.velocity.limit(this.maxspeed);
+                    this.location.add(this.velocity);
+                    this.acceleration.mult(0);
+                }
+
+                draw() {
+                    let theta = this.velocity.heading() + PI / 2;
+                    fill(0);
+                    push();
+                    translate(this.location.x, this.location.y);
+                    rotate(theta);
+                    polygon(this.location.x, this.location.y, 3, 40);
                 }
             }
             function setup() {
                 createCanvas(windowWidth, windowHeight);
 
-                // stroke(175);
+                stroke(175);
 
+                vehicle = new Vehicle(width / 2, height / 2);
                 path = new Path();
             }
 
             function draw() {
                 background('#000');
 
+                fill(175);
+                ellipse(mouseX, mouseY, 50);
+
+                const mouse = createVector(mouseX, mouseY);
+
+                vehicle.seek(mouse);
+                vehicle.update();
+                vehicle.draw();
+
                 path.draw();
+            }
+
+            function polygon(x, y, sides, radius) {
+                let angle = TWO_PI / sides;
+
+                pop();
+                beginShape();
+                for (let i = 0; i < sides; i++) {
+                    let px = x + cos(i * angle) * radius;
+                    let py = y + sin(i * angle) * radius;
+
+                    vertex(px, py, 0);
+                }
+                endShape(CLOSE);
+                push();
             }
         </script>
     </body>

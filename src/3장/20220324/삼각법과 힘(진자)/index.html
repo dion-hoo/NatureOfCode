@@ -92,7 +92,7 @@
                     this.origin = createVector(wdith, height);
                     this.location = createVector(0, 0);
 
-                    this.damping = 0.9999;
+                    this.damping = 0.7;
                 }
 
                 bouncing(object) {
@@ -103,7 +103,7 @@
                 }
 
                 update() {
-                    let gravity = 0.2;
+                    let gravity = 3;
 
                     this.aAcceleration = (gravity / this.r) * sin(this.angle);
 
