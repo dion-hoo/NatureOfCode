@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Document</title>
+        <style>
+            canvas {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: #000;
+            }
+        </style>
+
+        <script src="/p5.min.js"></script>
+    </head>
+    <body>
+        <script>
+            let vehicle;
+            let path;
+
+            class Path {
+                constructor() {
+                    this.radius = 20; // 경로의 너비
+                    this.start = createVector(0, height / 2);
+                    this.end = createVector(width, (2 * height) / 3);
+                    this.points = new Array();
+                }
+
+                addPoint(x, y) {
+                    this.points.push(createVector(x, y));
+                }
+
+                draw() {
+                    console.log(this.points);
+                    push();
+                    stroke(255);
+                    noFill();
+                    beginShape();
+                    for (let p of this.points) {
+                        vertex(p.x, p.y);
+                    }
+                    endShape();
+                    pop();
+                }
+            }
+
+            class Vehicle {
+                constructor(x, y) {
+                    this.location = createVector(x, y);
+                    this.velocity = createVector(0, 0);
+                    this.acceleration = createVector(0, 0);
+                    this.maxspeed = 14;
+                    this.maxforce = 10;
+                    this.r = 13;
+                }
+
+                applyForce(force) {
+                    const f = p5.Vector.div(force, this.r);
+
+                    this.acceleration.add(f);
+                }
+
+                seek(target) {
+                    const desired = p5.Vector.sub(target, this.location);
+
+                    desired.normalize();
+                    desired.mult(this.maxspeed);
+
+                    const ster = p5.Vector.sub(desired, this.velocity);
+
+                    ster.limit(this.maxforce);
+
+                    this.applyForce(ster);
+                }
+
+                update() {
+                    this.velocity.add(this.acceleration);
+                    this.velocity.limit(this.maxspeed);
+                    this.location.add(this.velocity);
+                    this.acceleration.mult(0);
+                }
+
+                draw() {
+                    let theta = this.velocity.heading() + PI / 2;
+                    fill(0);
+                    push();
+                    translate(this.location.x, this.location.y);
+                    rotate(theta);
+                    polygon(this.location.x, this.location.y, 3, 40);
+                }
+            }
+            function setup() {
+                createCanvas(windowWidth, windowHeight);
+
+                stroke(175);
+
+                vehicle = new Vehicle(width / 2, height / 2);
+                path = new Path();
+
+                path.addPoint(100, 100);
+                path.addPoint(200, 300);
+                path.addPoint(300, 100);
+                path.addPoint(400, 200);
+                path.addPoint(500, 100);
+
+                noLoop();
+            }
+
+            function draw() {
+                background('#000');
+
+                fill(175);
+                ellipse(mouseX, mouseY, 50);
+
+                const mouse = createVector(mouseX, mouseY);
+
+                vehicle.seek(mouse);
+                vehicle.update();
+                vehicle.draw();
+
+                path.draw();
+            }
+
+            function polygon(x, y, sides, radius) {
+                let angle = TWO_PI / sides;
+
+                pop();
+                beginShape();
+                for (let i = 0; i < sides; i++) {
+                    let px = x + cos(i * angle) * radius;
+                    let py = y + sin(i * angle) * radius;
+
+                    vertex(px, py, 0);
+                }
+                endShape(CLOSE);
+                push();
+            }
+        </script>
+    </body>
+</html>

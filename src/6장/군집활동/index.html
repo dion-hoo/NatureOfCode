@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Document</title>
+        <style>
+            canvas {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: #000;
+            }
+        </style>
+
+        <script src="/p5.min.js"></script>
+    </head>
+    <body>
+        <script>
+            let vehicle = [];
+
+            class Vehicle {
+                constructor(x, y) {
+                    this.location = createVector(x, y);
+                    this.velocity = createVector(0, 0);
+                    this.acceleration = createVector(0, 0);
+                    this.maxspeed = 14;
+                    this.maxforce = 10;
+                    this.r = 13;
+                }
+
+                applyForce(force) {
+                    const f = p5.Vector.div(force, this.r);
+
+                    this.acceleration.add(f);
+                }
+
+                applyBehaviors(vehicle) {
+                    const separateForce = this.separate(vehicle);
+                    const seekForce = this.seek(createVector(mouseX, mouseY));
+
+                    separateForce.mult(1.5);
+                    seekForce.mult(0.5);
+
+                    this.applyForce(separateForce);
+                    this.applyForce(seekForce);
+                }
+
+                seek(target) {
+                    const desired = p5.Vector.sub(target, this.location);
+
+                    desired.normalize();
+                    desired.mult(this.maxspeed);
+
+                    const ster = p5.Vector.sub(desired, this.velocity);
+
+                    ster.limit(this.maxforce);
+
+                    return ster;
+                }
+
+                separate(vehicle) {
+                    const desiredSeparation = 30; // 원하는 차량 간격
+                    const sum = createVector();
+                    let count = 0;
+
+                    for (let v of vehicle) {
+                        const distance = p5.Vector.dist(this.location, v.location);
+
+                        if (distance > 0 && distance < desiredSeparation) {
+                            // 0을 비교하는 거는 자기자신과 비교하지 않게 하기 위해서다
+
+                            const diff = p5.Vector.sub(this.location, v.location);
+
+                            diff.normalize(); // 방향을 구하고
+
+                            sum.add(diff); // 근처에 있는 모든 백터를 모두 더한다.
+                            count++;
+                        }
+                    }
+
+                    if (count > 0) {
+                        sum.div(count); // 그 백터들의 평균을 구한다.
+                        sum.normalize();
+                        sum.mult(this.maxspeed);
+
+                        const ster = p5.Vector.sub(sum, this.velocity);
+
+                        ster.limit(this.maxforce);
+
+                        return ster;
+                    }
+
+                    return sum;
+                }
+
+                update() {
+                    this.velocity.add(this.acceleration);
+                    this.velocity.limit(this.maxspeed);
+                    this.location.add(this.velocity);
+                    this.acceleration.mult(0);
+                }
+
+                draw() {
+                    let theta = this.velocity.heading() + PI / 2;
+                    fill(0);
+                    push();
+                    translate(this.location.x, this.location.y);
+                    rotate(theta);
+                    polygon(this.location.x, this.location.y, 5, 30);
+                }
+            }
+            function setup() {
+                createCanvas(windowWidth, windowHeight);
+
+                stroke(175);
+
+                for (let i = 0; i < 10; i++) {
+                    vehicle.push(new Vehicle(random(width), random(height)));
+                }
+            }
+
+            function draw() {
+                background('#000');
+
+                fill(175);
+                ellipse(mouseX, mouseY, 50);
+
+                for (let v of vehicle) {
+                    v.applyBehaviors(vehicle);
+                    v.update();
+                    v.draw();
+                }
+            }
+
+            function polygon(x, y, sides, radius) {
+                let angle = TWO_PI / sides;
+
+                pop();
+                beginShape();
+                for (let i = 0; i < sides; i++) {
+                    let px = x + cos(i * angle) * radius;
+                    let py = y + sin(i * angle) * radius;
+
+                    vertex(px, py, 0);
+                }
+                endShape(CLOSE);
+                push();
+            }
+        </script>
+    </body>
+</html>
