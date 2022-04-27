@@ -19,6 +19,7 @@
     </head>
     <body>
         <script>
+            let grid = [[]];
             let vehicle = [];
             let img;
             let frame = 240;
@@ -150,11 +151,10 @@
                         desired.mult(this.maxspeed);
                     }
 
-                    const steer = p5.Vector.sub(desired, this.velocity);
+                    desired.sub(this.velocity);
+                    desired.limit(this.maxforce);
 
-                    steer.limit(this.maxforce);
-
-                    return steer;
+                    return desired;
                 }
 
                 update() {
