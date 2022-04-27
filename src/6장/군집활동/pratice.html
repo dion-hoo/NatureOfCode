@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Document</title>
+        <style>
+            canvas {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: #000;
+            }
+        </style>
+
+        <script src="/p5.min.js"></script>
+    </head>
+    <body>
+        <script>
+            let vehicle = [];
+            class Vehicle {
+                constructor(x, y) {
+                    this.location = createVector(x, y);
+                    this.velocity = createVector(0, 0);
+                    this.acceleration = createVector(0, 0);
+                    this.maxspeed = 3;
+                    this.maxforce = 4;
+                    this.r = 16;
+                }
+
+                applyForce(force) {
+                    const f = force;
+
+                    this.acceleration.add(f);
+                }
+
+                seek(target) {
+                    const desired = p5.Vector.sub(target, this.location);
+                    const distance = desired.mag();
+
+                    desired.normalize();
+                    if (distance < 10) {
+                        desired.mult(distance, 0, 10, 0, this.maxspeed);
+                    } else {
+                        desired.mult(this.maxspeed);
+                    }
+
+                    const steer = p5.Vector.sub(desired, this.velocity);
+
+                    steer.limit(this.maxforce);
+
+                    this.applyForce(steer);
+                }
+
+                update() {
+                    this.velocity.add(this.acceleration);
+                    this.velocity.limit(this.maxspeed);
+                    this.location.add(this.velocity);
+                    this.acceleration.mult(0);
+                }
+
+                draw() {
+                    let theta = this.velocity.heading() + radians(-90);
+
+                    push();
+                    beginShape();
+                    translate(this.location.x, this.location.y);
+                    rotate(theta);
+                    vertex(16, 0);
+                    vertex(8, 20);
+                    vertex(0, 0);
+                    endShape(CLOSE);
+                    pop();
+                }
+            }
+            function setup() {
+                createCanvas(windowWidth, windowHeight);
+
+                stroke(175);
+                fill(175);
+
+                for (let i = 0; i < 5; i++) {
+                    vehicle.push(new Vehicle(width / 2, height / 2));
+                }
+            }
+
+            function draw() {
+                background('#000');
+
+                const mouse = createVector(mouseX, mouseY);
+
+                for (let v of vehicle) {
+                    v.seek(mouse);
+                    v.update();
+                    v.draw();
+                }
+            }
+        </script>
+    </body>
+</html>

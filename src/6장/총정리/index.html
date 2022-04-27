@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Vector</title>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>
+        <style>
+            canvas {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: radial-gradient(closest-side, #fff, #499ac9);
+            }
+        </style>
+    </head>
+    <body>
+        <script>
+            let vehicle = [];
+            let img;
+            let frame = 240;
+            function preload() {
+                img = loadImage('../../assets/img/fish.png');
+            }
+
+            class Vehicle {
+                constructor(x, y) {
+                    this.location = createVector(x, y);
+                    this.velocity = createVector(random(-1, 1), random(-1, 1));
+                    this.accleration = createVector(0, 0);
+                    this.maxspeed = 10;
+                    this.maxforce = 5;
+                    this.r = 10;
+                    this.distance = 70;
+                }
+
+                applyForce(force) {
+                    const f = p5.Vector.div(force, this.r);
+                    this.accleration.add(f);
+                }
+
+                applyBehaviors(vehicle) {
+                    const separate = this.separate(vehicle);
+                    const ali = this.align(vehicle);
+                    const coh = this.cohesion(vehicle);
+
+                    separate.mult(1.5);
+                    ali.mult(1);
+                    coh.mult(1);
+
+                    this.applyForce(separate);
+                    this.applyForce(ali);
+                    this.applyForce(coh);
+                }
+
+                // 가까운 거리의 평균 위치를 구하는 것이다.
+                cohesion(vehicle) {
+                    const sum = createVector(0, 0);
+                    let count = 0;
+
+                    for (let v of vehicle) {
+                        const distance = p5.Vector.dist(this.location, v.location);
+
+                        if (distance > 0 && distance < 20) {
+                            sum.add(v.location);
+                            count++;
+                        }
+                    }
+
+                    if (count > 0) {
+                        sum.div(count);
+
+                        return this.seek(sum);
+                    }
+
+                    return sum;
+                }
+
+                // 가까운 거리에 있는 애들이 조향력을 가지게 한다.(평균 속도를 찾아서 최대 스피드와 힘으로 조향을 준다.)
+                align(vehicle) {
+                    const sum = createVector(0, 0);
+                    let count = 0;
+
+                    for (let v of vehicle) {
+                        const distance = p5.Vector.dist(this.location, v.location);
+
+                        if (distance > 0 && distance < this.distance) {
+                            sum.add(v.velocity);
+                            count++;
+                        }
+                    }
+
+                    if (count > 0) {
+                        // sum.div(count); // 평균 속도를 구하고
+                        sum.normalize();
+                        sum.mult(this.maxspeed);
+
+                        const steer = p5.Vector.sub(sum, this.velocity);
+                        steer.limit(this.maxforce);
+
+                        return steer;
+                    }
+
+                    return sum;
+                }
+
+                separate(vehicle) {
+                    const sum = createVector(0, 0);
+                    let count = 0;
+
+                    for (let v of vehicle) {
+                        if (this === v) continue;
+
+                        const distance = p5.Vector.dist(this.location, v.location);
+
+                        if (distance > 0 && distance < this.distance) {
+                            const diff = p5.Vector.sub(this.location, v.location);
+
+                            diff.normalize();
+                            diff.div(distance);
+                            sum.add(diff);
+                            count++;
+                        }
+                    }
+
+                    if (count > 0) {
+                        // sum.div(count);
+                        sum.mult(this.maxspeed);
+
+                        const steer = p5.Vector.sub(sum, this.velocity);
+                        steer.limit(this.maxforce);
+
+                        return steer;
+                    }
+                    return sum;
+                }
+
+                seek(target) {
+                    const desired = p5.Vector.sub(target, this.location);
+                    const d = desired.mag();
+
+                    desired.normalize();
+
+                    if (d < this.distance) {
+                        desired.mult(0);
+                    } else {
+                        desired.mult(this.maxspeed);
+                    }
+
+                    const steer = p5.Vector.sub(desired, this.velocity);
+
+                    steer.limit(this.maxforce);
+
+                    return steer;
+                }
+
+                update() {
+                    this.velocity.add(this.accleration);
+                    this.velocity.limit(this.maxspeed);
+                    this.location.add(this.velocity);
+                    this.accleration.mult(0);
+                }
+
+                draw() {
+                    const theta = this.velocity.heading() + PI;
+
+                    fill(175);
+                    push();
+                    translate(this.location.x, this.location.y);
+                    rotate(theta);
+
+                    image(img, 0, 0, 50, 50);
+                    pop();
+                }
+            }
+            function setup() {
+                createCanvas(windowWidth, windowHeight);
+
+                noStroke();
+
+                for (let i = 0; i < 10; i++) {
+                    vehicle.push(new Vehicle(width / 2, height / 2));
+                }
+            }
+
+            function draw() {
+                clear();
+
+                fill('rgba(255, 255, 255, 0.3)');
+                ellipse(mouseX, mouseY, 50);
+
+                if (frameCount % frame === 0) {
+                    for (let i = 0; i < 6; i++) {
+                        vehicle.push(new Vehicle(random(width), random(height)));
+                    }
+                }
+
+                const mouse = createVector(mouseX, mouseY);
+
+                for (let i = 0; i < vehicle.length; i++) {
+                    const v = vehicle[i];
+                    const l = vehicle[i].location;
+
+                    const steer = v.seek(mouse);
+                    v.applyForce(steer);
+                    const separate = v.separate(vehicle);
+                    v.applyForce(separate);
+
+                    //  v.applyBehaviors(vehicle);
+                    v.update();
+                    v.draw();
+
+                    if (l.x < 0 || l.x > width || l.y < 0 || l.y > height) {
+                        vehicle.splice(i, 1);
+                    }
+                }
+            }
+
+            function doubleClicked() {
+                vehicle.push(new Vehicle(mouseX, mouseY));
+            }
+        </script>
+    </body>
+</html>
