@@ -20,83 +20,188 @@
     </head>
     <body>
         <script>
-            let vehicle = [];
-            class Vehicle {
+            let img;
+            let bird = [];
+            let drag = false;
+            let clicked = false;
+
+            function preload() {
+                img = loadImage('../../assets/img/bird.png');
+            }
+
+            class Bird {
                 constructor(x, y) {
                     this.location = createVector(x, y);
-                    this.velocity = createVector(0, 0);
-                    this.acceleration = createVector(0, 0);
+                    this.velocity = createVector(random(-1, 1), random(-1, 1));
+                    this.accleration = createVector(0, 0);
                     this.maxspeed = 3;
-                    this.maxforce = 4;
-                    this.r = 16;
+                    this.maxforce = 0.6;
+                    this.minDistance = 150;
                 }
 
                 applyForce(force) {
-                    const f = force;
+                    this.accleration.add(force);
+                }
 
-                    this.acceleration.add(f);
+                applyBehaviors(bird) {
+                    const sep = this.separate(bird);
+
+                    sep.mult(0.4);
+
+                    this.applyForce(sep);
+
+                    if (clicked) {
+                        const ali = this.align(bird);
+
+                        this.applyForce(ali);
+                    }
+
+                    if (drag) {
+                        const seek = this.seek(createVector(mouseX, mouseY));
+
+                        this.applyForce(seek);
+                    }
+                }
+
+                align(bird) {
+                    const sum = createVector(0, 0);
+                    let count = 0;
+
+                    for (let b of bird) {
+                        if (b === this) continue;
+
+                        const distance = p5.Vector.dist(this.location, b.location);
+
+                        if (distance < 100) {
+                            sum.add(b.velocity);
+                            count++;
+                        }
+                    }
+
+                    if (count > 0) {
+                        sum.div(count);
+                        sum.normalize();
+                        sum.mult(this.maxspeed);
+
+                        sum.sub(this.velocity);
+                        sum.limit(this.maxforce);
+
+                        return sum;
+                    }
+
+                    return sum;
+                }
+
+                separate(bird) {
+                    const sum = createVector(0, 0);
+                    let count = 0;
+
+                    for (let b of bird) {
+                        if (b === this) continue;
+
+                        const distance = p5.Vector.dist(this.location, b.location);
+                        if (distance < 50) {
+                            const diff = p5.Vector.sub(this.location, b.location);
+
+                            sum.add(diff);
+                            count++;
+                        }
+                    }
+
+                    if (count > 0) {
+                        sum.div(count);
+                        sum.normalize();
+
+                        sum.mult(this.maxspeed);
+                        sum.sub(this.velocity);
+                        sum.limit(this.maxforce);
+
+                        return sum;
+                    }
+
+                    return sum;
                 }
 
                 seek(target) {
+                    // 조향력
                     const desired = p5.Vector.sub(target, this.location);
-                    const distance = desired.mag();
+                    const distance = p5.Vector.dist(target, this.location);
 
                     desired.normalize();
-                    if (distance < 10) {
-                        desired.mult(distance, 0, 10, 0, this.maxspeed);
+
+                    if (0 < distance && distance < this.minDistance) {
+                        desired.mult(0);
                     } else {
                         desired.mult(this.maxspeed);
                     }
 
-                    const steer = p5.Vector.sub(desired, this.velocity);
+                    desired.sub(this.velocity);
+                    desired.limit(this.maxforce);
 
-                    steer.limit(this.maxforce);
-
-                    this.applyForce(steer);
+                    return desired;
                 }
 
                 update() {
-                    this.velocity.add(this.acceleration);
+                    this.velocity.add(this.accleration);
                     this.velocity.limit(this.maxspeed);
                     this.location.add(this.velocity);
-                    this.acceleration.mult(0);
+                    this.accleration.mult(0);
+
+                    if (this.location.x < 0) {
+                        this.location.x = width;
+                    }
+                    if (this.location.x > width) {
+                        this.location.x = 0;
+                    }
+                    if (this.location.y < 0) {
+                        this.location.y = height;
+                    }
+                    if (this.location.y > height) {
+                        this.location.y = 0;
+                    }
                 }
-
                 draw() {
-                    let theta = this.velocity.heading() + radians(-90);
-
+                    let theta = this.velocity.heading() + PI;
+                    fill(127);
+                    stroke(200);
                     push();
-                    beginShape();
                     translate(this.location.x, this.location.y);
                     rotate(theta);
-                    vertex(16, 0);
-                    vertex(8, 20);
-                    vertex(0, 0);
-                    endShape(CLOSE);
+                    image(img, 0, 0, 125, 75);
                     pop();
                 }
             }
             function setup() {
                 createCanvas(windowWidth, windowHeight);
 
-                stroke(175);
-                fill(175);
-
-                for (let i = 0; i < 5; i++) {
-                    vehicle.push(new Vehicle(width / 2, height / 2));
+                for (let i = 0; i < 20; i++) {
+                    bird.push(new Bird(random(width), random(height)));
                 }
             }
 
             function draw() {
-                background('#000');
+                background('#fff');
 
                 const mouse = createVector(mouseX, mouseY);
 
-                for (let v of vehicle) {
-                    v.seek(mouse);
-                    v.update();
-                    v.draw();
+                for (let b of bird) {
+                    b.applyBehaviors(bird);
+                    b.update();
+                    b.draw();
                 }
+            }
+
+            function mousePressed() {
+                drag = true;
+            }
+
+            function mouseReleased() {
+                drag = false;
+            }
+
+            function mouseClicked() {
+                clicked = true;
+                console.log('click');
             }
         </script>
     </body>
