@@ -20,23 +20,18 @@
     </head>
     <body>
         <script>
-            let img;
             let bird = [];
             let drag = false;
             let clicked = false;
 
-            function preload() {
-                img = loadImage('../../assets/img/bird.png');
-            }
-
             class Bird {
                 constructor(x, y) {
                     this.location = createVector(x, y);
-                    this.velocity = createVector(random(-1, 1), random(-1, 1));
+                    this.velocity = createVector(0, 0);
                     this.accleration = createVector(0, 0);
                     this.maxspeed = 3;
                     this.maxforce = 0.6;
-                    this.minDistance = 150;
+                    this.radius = 70;
                 }
 
                 applyForce(force) {
@@ -46,14 +41,13 @@
                 applyBehaviors(bird) {
                     const sep = this.separate(bird);
 
-                    sep.mult(0.4);
-
                     this.applyForce(sep);
 
                     if (clicked) {
-                        const ali = this.align(bird);
+                        const { vel, lo } = this.align(bird);
 
-                        this.applyForce(ali);
+                        this.applyForce(vel);
+                        this.applyForce(lo);
                     }
 
                     if (drag) {
@@ -64,7 +58,8 @@
                 }
 
                 align(bird) {
-                    const sum = createVector(0, 0);
+                    const vel = createVector(0, 0);
+                    const lo = createVector(0, 0);
                     let count = 0;
 
                     for (let b of bird) {
@@ -73,23 +68,31 @@
                         const distance = p5.Vector.dist(this.location, b.location);
 
                         if (distance < 100) {
-                            sum.add(b.velocity);
+                            vel.add(b.velocity);
+                            lo.add(b.location);
                             count++;
                         }
                     }
 
                     if (count > 0) {
-                        sum.div(count);
-                        sum.normalize();
-                        sum.mult(this.maxspeed);
+                        vel.div(count);
+                        vel.normalize();
+                        vel.mult(this.maxspeed);
 
-                        sum.sub(this.velocity);
-                        sum.limit(this.maxforce);
+                        vel.sub(this.velocity);
+                        vel.limit(this.maxforce);
 
-                        return sum;
+                        lo.div(count);
+                        lo.normalize();
+                        lo.mult(this.maxspeed);
+
+                        lo.sub(this.velocity);
+                        lo.limit(this.maxforce);
+
+                        return { vel, lo };
                     }
 
-                    return sum;
+                    return { vel, lo };
                 }
 
                 separate(bird) {
@@ -100,7 +103,7 @@
                         if (b === this) continue;
 
                         const distance = p5.Vector.dist(this.location, b.location);
-                        if (distance < 50) {
+                        if (distance < this.radius) {
                             const diff = p5.Vector.sub(this.location, b.location);
 
                             sum.add(diff);
@@ -129,7 +132,7 @@
 
                     desired.normalize();
 
-                    if (0 < distance && distance < this.minDistance) {
+                    if (0 < distance && distance < this.radius) {
                         desired.mult(0);
                     } else {
                         desired.mult(this.maxspeed);
@@ -153,34 +156,32 @@
                     if (this.location.x > width) {
                         this.location.x = 0;
                     }
-                    if (this.location.y < 0) {
-                        this.location.y = height;
-                    }
                     if (this.location.y > height) {
                         this.location.y = 0;
                     }
                 }
                 draw() {
                     let theta = this.velocity.heading() + PI;
-                    fill(127);
-                    stroke(200);
+                    stroke(255);
                     push();
                     translate(this.location.x, this.location.y);
                     rotate(theta);
-                    image(img, 0, 0, 125, 75);
+                    ellipse(0, 0, this.radius);
                     pop();
                 }
             }
             function setup() {
                 createCanvas(windowWidth, windowHeight);
 
-                for (let i = 0; i < 20; i++) {
-                    bird.push(new Bird(random(width), random(height)));
+                noFill();
+
+                for (let i = 0; i < 10; i++) {
+                    bird.push(new Bird(random(width), random(-50, 0)));
                 }
             }
 
             function draw() {
-                background('#fff');
+                background('#000');
 
                 const mouse = createVector(mouseX, mouseY);
 
@@ -201,7 +202,6 @@
 
             function mouseClicked() {
                 clicked = true;
-                console.log('click');
             }
         </script>
     </body>
