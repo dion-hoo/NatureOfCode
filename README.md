@@ -12,8 +12,8 @@
 -   [x] 파티클
 -   [x] 물리엔진 - 책이 p5.js기준으로 되어 있지 않아, 코드 분석하기가 어려워서 일단 패스.. box2D라이브러리를 사용하였기 때문에 더더욱이 코드 분석이 어렵다.
 -   [x] 자율 에이전트
--   [ ] 세포 오토마타 <span style="color: #dcffe4; font-weight:bold">STUDYING</span>
--   [ ] 프랙털
+-   [x] 세포 오토마타
+-   [ ] 프랙털 <span style="color: #dcffe4; font-weight:bold">STUDYING</span>
 -   [ ] 진화
 -   [ ] 뉴럴 네트워크
 -   [ ] 프로세싱 기초
