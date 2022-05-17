@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Document</title>
+        <style>
+            canvas {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: #000;
+            }
+        </style>
+
+        <script src="/p5.min.js"></script>
+    </head>
+    <body>
+        <script>
+            let lines = [];
+            class KochLine {
+                constructor(start, end) {
+                    this.start = start;
+                    this.end = end;
+                }
+
+                kochA() {
+                    return this.start.copy();
+                }
+                kochB() {
+                    const v = p5.Vector.sub(this.end, this.start);
+
+                    v.div(3);
+                    v.add(this.start);
+
+                    return v;
+                }
+
+                kochC() {
+                    const v = p5.Vector.sub(this.end, this.start);
+                    const a = this.start.copy();
+
+                    v.div(3);
+                    a.add(v);
+
+                    v.rotate(-PI / 3);
+                    a.add(v);
+
+                    return a;
+                }
+
+                kochD() {
+                    const v = p5.Vector.sub(this.end, this.start);
+
+                    v.mult(2 / 3);
+                    v.add(this.start);
+
+                    return v;
+                }
+                kochE() {
+                    return this.end.copy();
+                }
+
+                draw() {
+                    line(this.start.x, this.start.y, this.end.x, this.end.y);
+                }
+            }
+            function setup() {
+                createCanvas(windowWidth, windowHeight);
+
+                stroke(175);
+                noFill();
+
+                const start = createVector(0, 300);
+                const end = createVector(700, 300);
+
+                lines.push(new KochLine(start, end));
+
+                for (let i = 0; i < 4; i++) {
+                    generate();
+                }
+
+                function generate() {
+                    let next = [];
+
+                    for (let l of lines) {
+                        const a = l.kochA();
+                        const b = l.kochB();
+                        const c = l.kochC();
+                        const d = l.kochD();
+                        const e = l.kochE();
+
+                        next.push(new KochLine(a, b));
+                        next.push(new KochLine(b, c));
+                        next.push(new KochLine(c, d));
+                        next.push(new KochLine(d, e));
+                    }
+
+                    lines = next;
+                }
+            }
+
+            function draw() {
+                background('#000');
+
+                for (let l of lines) {
+                    l.draw();
+                }
+            }
+        </script>
+    </body>
+</html>

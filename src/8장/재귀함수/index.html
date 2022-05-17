@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Document</title>
+        <style>
+            canvas {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: #000;
+            }
+        </style>
+
+        <script src="/p5.min.js"></script>
+    </head>
+    <body>
+        <script>
+            function setup() {
+                createCanvas(windowWidth, windowHeight);
+
+                stroke(175);
+                noFill();
+
+                background('#000');
+
+                cantor(10, 20, width - 20);
+            }
+
+            function draw() {}
+
+            function cantor(x, y, len) {
+                line(x, y, x + len, y);
+
+                if (len < 1) return;
+
+                y += 20;
+
+                line(x, y, x + len / 3, y);
+
+                cantor(x, y, len / 3);
+                cantor(x + len * (2 / 3), y, len / 3);
+            }
+        </script>
+    </body>
+</html>
